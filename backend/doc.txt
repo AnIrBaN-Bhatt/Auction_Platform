@@ -1,0 +1,9 @@
+Installed packages bcrypt cloudinary cookie-parser cors express express-fileupload jsonwebtoken mongoose node-cron nodemailer
+
+Imported app.js in server.js
+Created account in cloudinary and created a API key
+Api key kept in config file 
+In APP.js we imported config.env and given config the path
+In app.js we imported cors. It helps us to connect frontend to backend.
+app.use(cookieParser());   In app.js to use the cookies generated
+ 
