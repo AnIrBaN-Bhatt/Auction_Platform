@@ -28,7 +28,7 @@ export const addNewAuctionItem = catchAsyncError(async (req, res, next) => {
         return next(new ErrorHandler("Auction starting time must be greater than current time", 400));
     }
 
-    if(new Date(endTime) < new Date(startTime)){
+    if(new Date(endTime) <= new Date(startTime)){
         return next(new ErrorHandler("Auction end time must be greater than start time", 400));
     }
 
