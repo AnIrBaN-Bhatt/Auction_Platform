@@ -3,6 +3,7 @@ import {User} from '../models/userSchema.js'
 import {catchAsyncError} from '../middlewares/catchAsyncError.js';
 import ErrorHandler from '../middlewares/error.js';
 import {v2 as cloudinary} from 'cloudinary';
+import mongoose from "mongoose";
 
 export const addNewAuctionItem = catchAsyncError(async (req, res, next) => {
 
@@ -67,6 +68,7 @@ export const addNewAuctionItem = catchAsyncError(async (req, res, next) => {
             },
             createdBy: req.user._id
         });
+        await auctionItem.populate('createdBy', 'userName email');
         return res.status(201).json({
             success: true,
             message: `Auction item created and will be listed on auction page at ${startTime}`,
@@ -78,3 +80,46 @@ export const addNewAuctionItem = catchAsyncError(async (req, res, next) => {
     }
 
 })
+
+export const getAllItems = catchAsyncError(async (req, res, next) => {
+    const auctions = await Auction.find({ endTime: { $gte: new Date() } })   //Fetching all auctions that are currently active
+        .populate('createdBy', 'userName email')
+        .sort({ startTime: 1 });
+
+    if (!auctions || auctions.length === 0) {
+        return res.status(404).json({
+            success: false,
+            message: "No active auctions found."
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        auctions
+    });
+});
+
+export const getMyAuctionItems = catchAsyncError(async (req, res, next) => {
+    
+});
+
+export const getMyAuctionDetails = catchAsyncError(async (req, res, next) => {
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return next(new ErrorHandler("Invalid auction ID", 400));
+    }
+    const auctionItem = await Auction.findById(id);
+    if(!auctionItem){
+        return next(new ErrorHandler("Auction item not found", 404));
+    }
+    const bidders = auctionItem.bids.sort((a,b) => b.bid - a.bid)
+    res.status(200).json({
+        success:true,
+        auctionItem,
+        bidders
+    })
+});
+
+export const removeFromAuction = catchAsyncError(async (req, res, next) => {});
+
+export const republishItem = catchAsyncError(async (req, res, next) => {});
