@@ -1,10 +1,18 @@
-import e from "express";
-import {addNewAuctionItem} from "../controllers/auctionItemController.js";
-import {isAuthenticated} from "../middlewares/auth.js";
+import {addNewAuctionItem, getAllItems, getMyAuctionDetails, removeFromAuction, republishItem} from "../controllers/auctionItemController.js";
+import {isAuthenticated,isAuthorized} from "../middlewares/auth.js";
 import express from "express";
 
 const router = express.Router();
 
-router.post("/create",isAuthenticated, addNewAuctionItem); // Route to create a new auction item
+router.post("/create",isAuthenticated,isAuthorized('Auctioneer'), addNewAuctionItem); // Route to create a new auction item
+
+router.get("/allItems",getAllItems);
+
+router.get("/allIems/:id",isAuthenticated, getMyAuctionDetails); // To view the details of a specific auction item
+
+router.delete("/delete/:id",isAuthenticated, isAuthorized('Auctioneer'),removeFromAuction);
+
+router.put("/item/republish/:id",isAuthenticated, isAuthorized('Auctioneer'), republishItem); // Route to republish an auction item
+
 
 export default router;   
