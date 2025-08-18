@@ -99,9 +99,6 @@ export const getAllItems = catchAsyncError(async (req, res, next) => {
     });
 });
 
-export const getMyAuctionItems = catchAsyncError(async (req, res, next) => {
-    
-});
 
 export const getMyAuctionDetails = catchAsyncError(async (req, res, next) => {
     const {id} = req.params;
@@ -117,6 +114,14 @@ export const getMyAuctionDetails = catchAsyncError(async (req, res, next) => {
         success:true,
         auctionItem,
         bidders
+    })
+});
+
+export const getMyAuctionItems = catchAsyncError(async (req, res, next) => {
+    const items = await Auction.find({createdBy:req.user._id});
+    res.status(200).json({
+        success:true,
+        items
     })
 });
 
