@@ -125,6 +125,57 @@ export const getMyAuctionItems = catchAsyncError(async (req, res, next) => {
     })
 });
 
-export const removeFromAuction = catchAsyncError(async (req, res, next) => {});
+export const removeFromAuction = catchAsyncError(async (req, res, next) => {
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return next(new ErrorHandler("Invalid auction ID", 400));
+    }
+    const auctionItem = await Auction.findById(id);
+    if(!auctionItem){
+        return next(new ErrorHandler("Auction item not found", 404));
+    }
+    await auctionItem.deleteOne();
+    res.status(200).json({
+        success:true,
+        message: "Auction item deleted successfully."
+    })
+});
 
-export const republishItem = catchAsyncError(async (req, res, next) => {});
+export const republishItem = catchAsyncError(async (req, res, next) => {
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return next(new ErrorHandler("Invalid auction ID", 400));
+    }
+    let auctionItem = await Auction.findById(id);
+    if(!auctionItem){
+        return next(new ErrorHandler("Auction item not found", 404));
+    }
+    if(auctionItem.endTime > Date.now()){
+        return next(new ErrorHandler("Auction already active , cannot republish", 400))
+    }
+    let data = {
+        startTime : new Date (req.body.startTime),
+        endTime : new Date (req.body.endTime)
+    }
+    if(data.startTime < Date.now()){
+        return next(new ErrorHandler("Auction starting time must be greater than present time" , 400))
+    }
+    if(data.startTime >= data.endTime){
+        return next(new ErrorHandler("Auction starting time must be less than ending time" , 400))
+    }
+    data.bids = [];
+    data.comissionCalculated = false;
+    auctionItem = await Auction.findByIdAndUpdate(id,data,{
+        new : true,
+        runValidators: true,
+        useFindAndModify: false
+    });
+    const createdBy = await User.findById(req.user._id);
+    createdBy.unpaidCommission = 0;
+    await createdBy.save();
+    res.status(200).json({
+        success:true,
+        auctionItem,
+        message:`Auction republished and will be active on ${req.body.startTime}.`
+    });
+});
