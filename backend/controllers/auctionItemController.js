@@ -150,13 +150,20 @@ export const republishItem = catchAsyncError(async (req, res, next) => {
     if(!auctionItem){
         return next(new ErrorHandler("Auction item not found", 404));
     }
-    if(auctionItem.endTime > Date.now()){
+    if(new Date(auctionItem.endTime) > Date.now()){
         return next(new ErrorHandler("Auction already active , cannot republish", 400))
     }
+    
+    if(!req.body || !req.body.startTime || !req.body.endTime){
+        return next(new ErrorHandler("Starttime and Endtime for republish is mandatory.", 400));
+    }
+
+    console.log(new Date(req.body.startTime));
     let data = {
         startTime : new Date (req.body.startTime),
         endTime : new Date (req.body.endTime)
     }
+
     if(data.startTime < Date.now()){
         return next(new ErrorHandler("Auction starting time must be greater than present time" , 400))
     }
@@ -170,12 +177,19 @@ export const republishItem = catchAsyncError(async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false
     });
-    const createdBy = await User.findById(req.user._id);
-    createdBy.unpaidCommission = 0;
-    await createdBy.save();
+    const createdBy = await User.findByIdAndUpdate(
+    req.user._id,
+    { unpaidCommission: 0 },
+    {
+      new: true,
+      runValidators: false,
+      useFindAndModify: false,
+    }
+  );
     res.status(200).json({
         success:true,
         auctionItem,
-        message:`Auction republished and will be active on ${req.body.startTime}.`
+        message:`Auction republished and will be active on ${req.body.startTime}.`,
+        createdBy
     });
 });
