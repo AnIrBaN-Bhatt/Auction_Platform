@@ -1,6 +1,6 @@
 import {User} from "../models/userSchema.js"
 import {catchAsyncError} from "../middlewares/catchAsyncError.js"
-import ErrorHandler from "./error.js"
+import ErrorHandler from "../middlewares/error.js"
 
 export const trackCommissionStatus = catchAsyncError(async (req,res,next) => {
     const user = await User.findById(req.user._id);
