@@ -1,10 +1,11 @@
 import {addNewAuctionItem, getAllItems, getMyAuctionDetails, removeFromAuction, republishItem, getMyAuctionItems} from "../controllers/auctionItemController.js";
 import {isAuthenticated,isAuthorized} from "../middlewares/auth.js";
 import express from "express";
+import { trackCommissionStatus } from "../middlewares/trackCommission.js";
 
 const router = express.Router();
 
-router.post("/create",isAuthenticated,isAuthorized('Auctioneer'), addNewAuctionItem); // Route to create a new auction item
+router.post("/create",isAuthenticated,isAuthorized('Auctioneer'), trackCommissionStatus, addNewAuctionItem); // Route to create a new auction item
 
 router.get("/allItems",getAllItems);
 
