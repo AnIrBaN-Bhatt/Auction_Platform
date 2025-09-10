@@ -7,6 +7,7 @@ import { connection } from "./Database/connection.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import userRouter from "./router/userRoutes.js";
 import auctionItemRouter from "./router/auctionItemRoutes.js";
+import bidRouter from "./router/bidRoutes.js"
 
 
 const app = express();
@@ -33,7 +34,8 @@ app.use(fileUpload({                                            //To upload file
 }));
 
 app.use("/api/v1/user", userRouter);                                 // To use the user routes
-app.use("/api/v1/auctionitem", auctionItemRouter);                     // To use the auction item routes
+app.use("/api/v1/auctionitem", auctionItemRouter);                    // To use the auction item routes
+app.use("/api/v1/bid", bidRouter)
 
 connection();
 
