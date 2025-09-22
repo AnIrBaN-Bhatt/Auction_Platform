@@ -9,7 +9,7 @@ import userRouter from "./router/userRoutes.js";
 import auctionItemRouter from "./router/auctionItemRoutes.js";
 import bidRouter from "./router/bidRoutes.js"
 import commissionRouter from "./router/commissionRoutes.js"
-
+import superAdminRouter from "./router/superAdminRoutes.js"
 
 const app = express();
 
@@ -38,6 +38,7 @@ app.use("/api/v1/user", userRouter);                                 // To use t
 app.use("/api/v1/auctionitem", auctionItemRouter);                    // To use the auction item routes
 app.use("/api/v1/bid", bidRouter);
 app.use("/api/v1/commission" , commissionRouter);
+app.use("/api/v1/superadimin" , superAdminRouter);
 
 connection();
 
