@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const commissionSchema = new mongoose.Model({
+const commissionSchema = new mongoose.Schema({
     amount : Number,
     user : mongoose.Schema.Types.ObjectId,
     createdAt : {
